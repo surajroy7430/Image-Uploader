@@ -65,7 +65,7 @@ const uploadFile = async (req, res) => {
     const image = await Image.create({
       fileKey: imageKey,
       fileUrl: result.fileUrl,
-      fileSize: req.file.buffer.length
+      fileSize: req.file.buffer.length,
     });
 
     res
@@ -90,6 +90,8 @@ const listImages = async (req, res) => {
 const deleteFile = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!id || id === "undefined")
+      return res.status(400).json({ error: "Invalid ID" });
 
     const image = await Image.findById(id);
     if (!image) return res.status(400).json({ error: "Image not found" });
