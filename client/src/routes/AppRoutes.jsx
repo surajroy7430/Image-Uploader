@@ -9,15 +9,16 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route element={<PublicRoute />}>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Route>
 
       <Route element={<PrivateRoute />}>
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/folder/:folderName" element={<Dashboard />} />
         <Route path="/upload-image" element={<FileUploadForm />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 };

@@ -1,12 +1,18 @@
-import { Link } from "react-router-dom";
-import { toast } from "sonner";
-import { ExternalLink, Trash2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { useFile } from "../context/FileContext";
 import axios from "axios";
+import { toast } from "sonner";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useFile } from "../context/FileContext";
+import { groupFiles } from "../services/groupFiles";
+import { FolderClosed, FolderOpen, MoveLeft } from "lucide-react";
+import FileCard from "./FileCard";
 
 const Dashboard = () => {
+  const { folderName } = useParams();
+  const navigate = useNavigate();
+
   const { files, fetchImages } = useFile();
+  const { grouped, rootFiles } = groupFiles(files);
 
   const handleDelete = async (id) => {
     try {
@@ -15,13 +21,27 @@ const Dashboard = () => {
       );
       toast.success("File Deleted");
       await fetchImages();
+
+      if (
+        folderName &&
+        (!grouped[folderName] || grouped[folderName].length === 0)
+      ) {
+        navigate("/");
+      }
     } catch (error) {
       console.error(error);
       toast.error(error?.response?.data?.error || "Delete failed");
     }
   };
 
-  // console.log(files);
+  const renderImages = (files = []) => {
+    return files
+      .slice()
+      .sort((a, b) => a.fileName.localeCompare(b.fileName))
+      .map((file) => (
+        <FileCard key={file._id} file={file} onDelete={handleDelete} />
+      ));
+  };
 
   return (
     <>
@@ -34,75 +54,57 @@ const Dashboard = () => {
         </Link>
       </div>
       <div className="mt-10">
-        <div className="">
+        <div>
           <h4 className="text-xl font-bold mb-1.5">Images</h4>
           <p className="text-zinc-500">
             Total ({files.length}) files uploaded.
           </p>
         </div>
-        <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {files
-            .slice()
-            .sort((a, b) =>
-              a.fileKey
-                .replace("uploads/", "")
-                .localeCompare(b.fileKey.replace("uploads/", ""))
-            )
-            .map((file) => {
-              const fileName = file.fileKey.replace("uploads/", "");
-              const fileSize =
-                file.fileSize >= 1024 * 1024
-                  ? `${(file.fileSize / (1024 * 1024)).toFixed(2)} MB`
-                  : `${(file.fileSize / 1024).toFixed(2)} KB`;
 
-              return (
-                <div
-                  key={file._id}
-                  className="relative h-60 aspect-auto overflow-hidden rounded-lg group"
+        {folderName && (
+          <Button
+            variant="outline"
+            className="rounded-full transition-all duration-300 group mt-4"
+            onClick={() => navigate("/")}
+          >
+            <span className="transition-transform duration-300 group-hover:-translate-x-1">
+              <MoveLeft />
+            </span>{" "}
+            Back
+          </Button>
+        )}
+
+        <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          {!folderName &&
+            Object.keys(grouped)
+              .sort()
+              .map((folder) => (
+                <Link
+                  key={folder}
+                  to={`/folder/${folder}`}
+                  className="group p-5 rounded-lg bg-zinc-900 text-white flex flex-col items-center justify-center cursor-pointer hover:bg-zinc-800 transition"
                 >
-                  {/* Image */}
-                  <img
-                    src={file.fileUrl}
-                    alt={fileName}
-                    loading="lazy"
-                    className="w-full h-full object-fill"
+                  <FolderClosed
+                    size={100}
+                    className="group-hover:hidden transition-transform duration-300"
+                  />
+                  <FolderOpen
+                    size={100}
+                    className="hidden group-hover:block transition-transform duration-300"
                   />
 
-                  {/* Overlay Content */}
-                  <div className="absolute inset-0 bg-black/40 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="flex justify-between p-4 items-center">
-                      <Trash2
-                        size={20}
-                        onClick={() => handleDelete(file._id)}
-                        className="text-red-100 hover:text-red-600 cursor-pointer transition"
-                      />
-                      <a
-                        href={file.fileUrl}
-                        rel="nooperner noreferrer"
-                        target="_blank"
-                      >
-                        <ExternalLink
-                          size={20}
-                          className="text-zinc-300 hover:text-blue-600 transition"
-                        />
-                      </a>
-                    </div>
+                  <p className="mt-2 font-semibold">{folder}</p>
+                  <p className="text-xs text-zinc-400">
+                    {grouped[folder].length} files
+                  </p>
+                </Link>
+              ))}
 
-                    {/* File Info */}
-                    <div className="text-xs md:text-sm p-3 space-y-0.5 pointer-events-none">
-                      <div className="font-semibold text-center">
-                        {fileName}
-                      </div>
-                      <div className="text-center mt-1">
-                        <Badge className="bg-muted/30 text-zinc-300">
-                          {fileSize}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          {/* Root-level files */}
+          {!folderName && renderImages(rootFiles)}
+
+          {/* Files inside folder */}
+          {folderName && renderImages(grouped[folderName])}
         </div>
       </div>
     </>

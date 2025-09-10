@@ -34,7 +34,7 @@ const LoginPage = () => {
       toast.success("Logged in", { duration: 1500 });
       form.reset();
 
-      navigate("/dashboard", { replace: true });
+      navigate("/", { replace: true });
     } catch (error) {
       const err = error?.code?.replace("auth/", "")?.replace("-", " ");
       toast.error(err || error.message);
