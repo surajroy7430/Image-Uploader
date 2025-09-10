@@ -195,6 +195,7 @@ const FileUploadForm = () => {
                     <Input
                       {...field}
                       id="imageKey"
+                      autoComplete="off"
                       className="pl-8 py-5.5"
                       placeholder="folder/filename.ext"
                       disabled={form.formState.isSubmitting}
