@@ -15,7 +15,6 @@ const previewFile = async (req, res) => {
     const ext = path.extname(originalname) || "jpg";
     const name = path
       .basename(originalname, path.extname(originalname))
-      .toLowerCase()
       .replace(/\s*\(.*?\)|\s*\[.*?\]|\s*\{.*?\}/g, "") // remove brackets data
       .replace(/[\s_,]+/g, "-") // replace spaces/commas/underscores with "-"
       .replace(/-+/g, "-") // collapse multiple dashes
