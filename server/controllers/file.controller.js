@@ -22,7 +22,7 @@ const previewFile = async (req, res) => {
 
     const { width, height } = await sharp(buffer).metadata();
 
-    const imageKey = `uploads/${name}-${width}x${height}${ext}`;
+    const imageKey = `artists/${name}-${width}x${height}${ext}`;
 
     res
       .status(200)
