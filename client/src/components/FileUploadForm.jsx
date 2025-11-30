@@ -157,6 +157,8 @@ const FileUploadForm = () => {
                         disabled={isProcessing}
                         className="hidden"
                         onChange={(e) => {
+                          if (isProcessing) return;
+                          
                           field.onChange(e.target.files?.[0]);
                           onFileChange(e);
                         }}
