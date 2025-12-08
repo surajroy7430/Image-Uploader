@@ -84,7 +84,7 @@ const FileUploadForm = () => {
       }
 
       const res = await saveImage(values);
-      toast.success("Image Saved! ID: " + res?.fileId);
+      toast.success("Image Saved!", { description: res?.fileKey });
 
       resetForm();
     } catch (error) {

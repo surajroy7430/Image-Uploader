@@ -13,6 +13,6 @@ router.post("/upload", multerUpload.single("image"), uploadFile);
 
 router.get("/images", listImages);
 
-router.delete("/delete/:id", deleteFile);
+router.delete("/delete", deleteFile);
 
 module.exports = router;

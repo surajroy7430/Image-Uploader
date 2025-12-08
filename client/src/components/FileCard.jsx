@@ -8,10 +8,7 @@ const FileCard = ({ file, onDelete }) => {
       : `${(file.fileSize / 1024).toFixed(2)} KB`;
 
   return (
-    <div
-      key={file._id}
-      className="relative h-60 aspect-auto overflow-hidden rounded-lg group"
-    >
+    <div className="relative h-60 aspect-auto overflow-hidden rounded-lg group">
       {/* Image */}
       <img
         src={file.fileUrl}
@@ -25,7 +22,7 @@ const FileCard = ({ file, onDelete }) => {
         <div className="flex justify-between p-4 items-center">
           <Trash2
             size={20}
-            onClick={() => onDelete(file._id)}
+            onClick={() => onDelete(file.fileKey)}
             className="text-red-100 hover:text-red-600 cursor-pointer transition"
           />
           <a href={file.fileUrl} rel="nooperner noreferrer" target="_blank">
