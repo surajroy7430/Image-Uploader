@@ -16,7 +16,6 @@ const previewFile = async (req, res) => {
     const ext = path.extname(originalname) || "jpg";
     const name = path
       .basename(originalname, path.extname(originalname))
-      .toLowerCase()
       .replace(/\s*\(.*?\)|\s*\[.*?\]|\s*\{.*?\}/g, "") // remove brackets data
       .replace(/[\s_,]+/g, "-") // replace spaces/commas/underscores with "-"
       .replace(/-+/g, "-") // collapse multiple dashes
@@ -24,7 +23,7 @@ const previewFile = async (req, res) => {
 
     const { width, height } = await sharp(buffer).metadata();
 
-    const imageKey = `uploads/${name}-${width}x${height}${ext}`;
+    const imageKey = `artists/${name}-${width}x${height}${ext}`;
 
     res
       .status(200)

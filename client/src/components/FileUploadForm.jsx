@@ -30,6 +30,8 @@ const FileUploadForm = () => {
     setFormatedDate(getFormatedDate());
   }, []);
 
+  const isProcessing = status !== "";
+
   const onFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -126,16 +128,19 @@ const FileUploadForm = () => {
                 <FormControl>
                   <div
                     onDrop={(e) => {
+                      if (isProcessing) return; // disable drag drop
                       e.preventDefault();
                       const file = e.dataTransfer.files?.[0];
                       if (file) onFileChange({ target: { files: [file] } });
                     }}
                     onDragOver={(e) => e.preventDefault()}
                     onDragEnter={(e) => e.preventDefault()}
+                    className={isProcessing ? "opacity-50 pointer-events-none" : ""}
                   >
                     <Label
                       className={cn(
                         "flex flex-col items-center justify-center border border-dashed bg-zinc-800/40 hover:bg-zinc-800 rounded cursor-pointer transition text-center min-h-[200px]",
+                        isProcessing && "cursor-not-allowed opacity-50",
                         form.formState.errors.imageFile
                           ? "border-red-500"
                           : "border-zinc-600"
@@ -149,8 +154,11 @@ const FileUploadForm = () => {
                       <Input
                         type="file"
                         accept="image/*"
+                        disabled={isProcessing}
                         className="hidden"
                         onChange={(e) => {
+                          if (isProcessing) return;
+                          
                           field.onChange(e.target.files?.[0]);
                           onFileChange(e);
                         }}
