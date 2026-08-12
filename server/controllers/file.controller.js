@@ -12,6 +12,20 @@ const previewFile = async (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
     const { originalname, buffer } = req.file;
+    const { folder = "artists" } = req.body;
+
+    const allowedFolders = [
+      "actors",
+      "albums",
+      "artists",
+      "covers",
+      "mm",
+      "labels",
+      "uploads",
+    ];
+    if (!allowedFolders.includes(folder)) {
+      return res.status(400).json({ error: "Invalid folder" });
+    }
 
     const ext = path.extname(originalname) || "jpg";
     const name = path
@@ -23,7 +37,7 @@ const previewFile = async (req, res) => {
 
     const { width, height } = await sharp(buffer).metadata();
 
-    const imageKey = `artists/${name}-${width}x${height}${ext}`;
+    const imageKey = `${folder}/${name}-${width}x${height}${ext}`;
 
     res
       .status(200)
@@ -67,7 +81,15 @@ const uploadFile = async (req, res) => {
 
 const listImages = async (req, res) => {
   try {
-    const folders = ["artists/", "albums/", "covers/", "mm/", "uploads/"];
+    const folders = [
+      "actors/",
+      "albums/",
+      "artists/",
+      "covers/",
+      "mm/",
+      "labels/",
+      "uploads/",
+    ];
 
     let allFiles = [];
 
@@ -110,7 +132,7 @@ const deleteFile = async (req, res) => {
       new DeleteObjectCommand({
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: fileKey,
-      })
+      }),
     );
 
     res.json({ message: "file deleted", fileKey });
