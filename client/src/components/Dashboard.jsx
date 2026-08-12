@@ -1,20 +1,37 @@
 import axios from "axios";
 import { toast } from "sonner";
+import { useMemo, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { FolderClosed, FolderOpen, MoveLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFile } from "../context/FileContext";
 import FileCard from "./FileCard";
 
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
 const Dashboard = () => {
   const { folderName } = useParams();
   const navigate = useNavigate();
 
   const { files, fetchImages } = useFile();
+  const [selectedLetter, setSelectedLetter] = useState(null);
 
   const folders = [...new Set(files.map((f) => f.folder))].sort();
 
   const folderFiles = files.filter((f) => f.folder === folderName);
+
+  const availableLetters = useMemo(() => {
+    const set = new Set(
+      folderFiles.map((f) => f.fileName?.[0]?.toUpperCase()).filter(Boolean),
+    );
+    return set;
+  }, [folderFiles]);
+
+  const visibleFiles = selectedLetter
+    ? folderFiles.filter(
+        (f) => f.fileName?.[0]?.toUpperCase() === selectedLetter,
+      )
+    : folderFiles;
 
   const handleDelete = async (fileKey) => {
     try {
@@ -22,7 +39,7 @@ const Dashboard = () => {
         `${import.meta.env.VITE_BASE_URL}/minxs-music/delete`,
         {
           params: { fileKey },
-        }
+        },
       );
 
       toast.success("File Deleted");
@@ -74,6 +91,43 @@ const Dashboard = () => {
           </Button>
         )}
 
+        {folderName && (
+          <div className="mt-5 flex flex-wrap gap-1.5">
+            <button
+              onClick={() => setSelectedLetter(null)}
+              className={`px-3 py-1 text-xs font-semibold rounded-full transition ${
+                selectedLetter === null
+                  ? "bg-red-600 text-white"
+                  : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+              }`}
+            >
+              All
+            </button>
+
+            {ALPHABET.map((letter) => {
+              const hasFiles = availableLetters.has(letter);
+              const isActive = selectedLetter === letter;
+
+              return (
+                <button
+                  key={letter}
+                  disabled={!hasFiles}
+                  onClick={() => setSelectedLetter(letter)}
+                  className={`w-7 h-7 flex items-center justify-center text-xs font-semibold rounded-full transition ${
+                    isActive
+                      ? "bg-red-600 text-white"
+                      : hasFiles
+                        ? "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                        : "bg-zinc-900 text-zinc-600 cursor-not-allowed"
+                  }`}
+                >
+                  {letter}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {!folderName &&
             folders.map((folder) => (
@@ -93,7 +147,7 @@ const Dashboard = () => {
             ))}
 
           {/* Files inside folder */}
-          {folderName && renderImages(folderFiles)}
+          {folderName && renderImages(visibleFiles)}
         </div>
       </div>
     </>
