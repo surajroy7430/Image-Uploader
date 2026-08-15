@@ -8,36 +8,45 @@ const FileCard = ({ file, onDelete }) => {
       : `${(file.fileSize / 1024).toFixed(2)} KB`;
 
   return (
-    <div className="relative h-60 aspect-auto overflow-hidden rounded-lg group">
+    <div className="panel relative h-60 aspect-auto overflow-hidden rounded-lg group transition-all duration-500 hover:-translate-y-1 hover:glow-ring">
       {/* Image */}
       <img
         src={file.fileUrl}
         alt={file.fileName}
-        loading="eager"
-        className="w-full h-full object-contain rounded-lg"
+        loading="lazy"
+        className="w-full h-full object-fill rounded-lg transition-transform duration-700 group-hover:scale-105"
       />
 
       {/* Overlay Content */}
-      <div className="absolute inset-0 bg-black/40 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <div className="flex justify-between p-4 items-center">
-          <Trash2
-            size={20}
+      <div className="absolute inset-0 flex flex-col justify-between rounded-lg bg-gradient-to-t from-background/95 via-background/35 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+        <div className="flex items-center justify-between p-4">
+          <button
+            type="button"
             onClick={() => onDelete(file.fileKey)}
-            className="text-red-100 hover:text-red-600 cursor-pointer transition"
-          />
-          <a href={file.fileUrl} rel="nooperner noreferrer" target="_blank">
-            <ExternalLink
-              size={20}
-              className="text-zinc-300 hover:text-blue-600 transition"
-            />
+            className="grid size-9 place-items-center rounded-full border border-border bg-surface/80 text-muted-foreground hover:text-destructive hover:border-destructive/60 cursor-pointer transition"
+          >
+            <Trash2 size={16} />
+          </button>
+
+          <a
+            href={file.fileUrl}
+            rel="nooperner noreferrer"
+            target="_blank"
+            className="grid size-9 place-items-center rounded-full border border-border bg-surface/80 text-muted-foreground hover:text-signal hover:border-signal/60 transition"
+          >
+            <ExternalLink size={16} />
           </a>
         </div>
 
         {/* File Info */}
-        <div className="text-xs md:text-sm p-3 space-y-0.5 pointer-events-none">
-          <div className="font-semibold text-center">{file.fileName}</div>
+        <div className="text-xs md:text-sm p-4 space-y-1 pointer-events-none">
+          <div className="font-semibold text-center tracking-tight truncate">
+            {file.fileName}
+          </div>
           <div className="text-center mt-1">
-            <Badge className="bg-muted/30 text-zinc-300">{fileSize}</Badge>
+            <Badge className="bg-surface-elevated text-muted-foreground border border-border font-mono">
+              {fileSize}
+            </Badge>
           </div>
         </div>
       </div>
