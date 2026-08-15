@@ -2,7 +2,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useMemo, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { FolderClosed, FolderOpen, MoveLeft } from "lucide-react";
+import { FolderClosed, FolderOpen, MoveLeft, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFile } from "../context/FileContext";
 import FileCard from "./FileCard";
@@ -62,26 +62,54 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="text-center">
+      <div className="panel rounded-2xl p-8 md:p-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="rail pl-5">
+          <p className="text-[11px] uppercase tracking-[0.35em] text-muted-foreground">
+            Media console
+          </p>
+          <h1 className="mt-2 text-3xl md:text-4xl font-bold text-gradient">
+            Asset Library
+          </h1>
+
+          <div className="mt-3 flex gap-6">
+            <div>
+              <p className="text-2xl font-semibold">{folders.length}</p>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                folders
+              </p>
+            </div>
+            <div>
+              <p className="text-2xl font-semibold">{files.length}</p>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                files
+              </p>
+            </div>
+          </div>
+        </div>
         <Link
           to="/upload-image"
-          className="bg-red-600 hover:bg-red-700 py-2.5 px-10 rounded-full"
+          className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:opacity-90 hover:glow-ring"
         >
+          <Upload size={16} />
           Upload Image
         </Link>
       </div>
+
       <div className="mt-10">
-        <div>
-          <h4 className="text-xl font-bold mb-1.5">Images</h4>
-          <p className="text-zinc-500">
-            Total ({files.length}) files uploaded.
+        <div className="rail pl-5">
+          <h4 className="text-xl font-bold mb-1.5 uppercase">
+            {folderName ? folderName : "Images"}
+          </h4>
+          <p className="text-sm text-muted-foreground">
+            Total ({folderName ? folderFiles.length : files.length}) files
+            {folderName ? " in this folder." : " uploaded."}
           </p>
         </div>
 
         {folderName && (
           <Button
             variant="outline"
-            className="rounded-full transition-all duration-300 group mt-4"
+            className="rounded-full border-border/80 bg-surface-elevated/60 transition-all duration-300 group mt-5"
             onClick={() => navigate("/")}
           >
             <span className="transition-transform duration-300 group-hover:-translate-x-1">
@@ -92,13 +120,13 @@ const Dashboard = () => {
         )}
 
         {folderName && (
-          <div className="mt-5 flex flex-wrap gap-1.5">
+          <div className="panel mt-5 flex flex-wrap gap-1.5 rounded-2xl p-3">
             <button
               onClick={() => setSelectedLetter(null)}
               className={`px-3 py-1 text-xs font-semibold rounded-full transition ${
                 selectedLetter === null
-                  ? "bg-red-600 text-white"
-                  : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-surface-elevated text-muted-foreground hover:text-foreground"
               }`}
             >
               All
@@ -115,10 +143,10 @@ const Dashboard = () => {
                   onClick={() => setSelectedLetter(letter)}
                   className={`w-7 h-7 flex items-center justify-center text-xs font-semibold rounded-full transition ${
                     isActive
-                      ? "bg-red-600 text-white"
+                      ? "bg-primary text-primary-foreground"
                       : hasFiles
-                        ? "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-                        : "bg-zinc-900 text-zinc-600 cursor-not-allowed"
+                        ? "bg-surface-elevated text-muted-foreground hover:text-foreground"
+                        : "bg-surface/60 text-muted-foreground/35 cursor-not-allowed"
                   }`}
                 >
                   {letter}
@@ -134,13 +162,21 @@ const Dashboard = () => {
               <Link
                 key={folder}
                 to={`/folder/${folder}`}
-                className="group p-5 rounded-lg bg-zinc-900 text-white flex flex-col items-center justify-center cursor-pointer hover:bg-zinc-800 transition"
+                className="panel group p-6 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:glow-ring"
               >
-                <FolderClosed size={100} className="group-hover:hidden" />
-                <FolderOpen size={100} className="hidden group-hover:block" />
+                <FolderClosed
+                  size={84}
+                  strokeWidth={1}
+                  className="group-hover:hidden text-muted-foreground"
+                />
+                <FolderOpen
+                  size={84}
+                  strokeWidth={1}
+                  className="hidden group-hover:block text-primary"
+                />
 
-                <p className="mt-2 font-semibold">{folder}</p>
-                <p className="text-xs text-zinc-400">
+                <p className="mt-3 font-semibold tracking-tight">{folder}</p>
+                <p className="text-xs text-muted-foreground font-mono mt-0.5 uppercase">
                   {files.filter((f) => f.folder === folder).length} files
                 </p>
               </Link>
@@ -149,6 +185,12 @@ const Dashboard = () => {
           {/* Files inside folder */}
           {folderName && renderImages(visibleFiles)}
         </div>
+
+        {folderName && visibleFiles.length === 0 && (
+          <div className="panel mt-7 rounded-2xl p-10 text-center text-sm text-muted-foreground">
+            Nothing here yet.
+          </div>
+        )}
       </div>
     </>
   );
