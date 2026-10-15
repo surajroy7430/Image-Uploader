@@ -18,7 +18,7 @@ const FileCard = ({ file, onDelete }) => {
       />
 
       {/* Overlay Content */}
-      <div className="absolute inset-0 flex flex-col justify-between rounded-lg bg-gradient-to-t from-background/95 via-background/35 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+      <div className="absolute inset-0 flex flex-col justify-between rounded-lg bg-gradient-to-t from-background/95 via-background/35 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500">
         <div className="flex items-center justify-between p-4">
           <button
             type="button"
@@ -30,7 +30,7 @@ const FileCard = ({ file, onDelete }) => {
 
           <a
             href={file.fileUrl}
-            rel="nooperner noreferrer"
+            rel="noopener noreferrer"
             target="_blank"
             className="grid size-9 place-items-center rounded-full border border-border bg-surface/80 text-muted-foreground hover:text-signal hover:border-signal/60 transition"
           >
